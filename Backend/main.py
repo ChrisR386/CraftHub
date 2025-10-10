@@ -1,14 +1,26 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from app.core.database import Base, engine
+from app.models import models  # wir erstellen das gleich
 
-app = FastAPI(title="CraftHub API", version="1.0.0")
+# Falls Models registriert sind, Datenbanktabellen erstellen
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(title="CraftHub API")
+
+# CORS aktivieren
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # später sicherer machen
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
-def root():
+def read_root():
     return {"message": "Welcome to CraftHub API!"}
 
-@app.get("/projects")
-def get_projects():
-    return [
-        {"id": 1, "title": "Lasergravur-Projekt", "status": "in_progress"},
-        {"id": 2, "title": "Halsband-Kollektion", "status": "completed"}
-    ]
+@app.get("/test")
+def read_test():
+    return {"status": "ok", "info": "CraftHub backend läuft!"}
